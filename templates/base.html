@@ -1,0 +1,965 @@
+<!DOCTYPE html>
+<html lang="id" data-bs-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Klinik Management System - Ngokolola data klinik, pasien, dokter, appointment, resep, jeung invoice">
+    <meta name="theme-color" content="#3b82f6">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <title>{% block title %}Klinik Management{% endblock %}</title>
+    <!-- Preconnect to CDN for performance -->
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" integrity="sha384-wn5YmEzWt7pSrj8U2f1Y2f3X4Y5Z6W7A8B9C0D1E2F3G4H5I6J7K8L0M1N2O3P4Q" crossorigin="anonymous">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* ===== ACCESSIBILITY ===== */
+        
+        /* Skip Navigation Link */
+        .skip-link {
+            position: absolute;
+            top: -100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--primary);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 0 0 8px 8px;
+            z-index: 10000;
+            font-weight: 600;
+            text-decoration: none;
+            transition: top 0.3s ease;
+        }
+        
+        .skip-link:focus {
+            top: 0;
+            outline: 3px solid var(--warning);
+            outline-offset: 2px;
+        }
+        
+        /* Focus Indicators */
+        *:focus-visible {
+            outline: 3px solid var(--primary);
+            outline-offset: 2px;
+        }
+        
+        /* High Contrast Mode */
+        @media (prefers-contrast: high) {
+            :root {
+                --primary: #0000ee;
+                --primary-dark: #000099;
+            }
+            .btn {
+                border: 2px solid currentColor;
+            }
+            .table tbody td,
+            .table thead th {
+                border: 1px solid #000;
+            }
+        }
+        
+        /* Reduced Motion */
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+                scroll-behavior: auto !important;
+            }
+        }
+        
+        /* Screen Reader Only */
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+        
+        /* Screen Reader Only (Focusable) */
+        .sr-only-focusable:focus {
+            position: static;
+            width: auto;
+            height: auto;
+            padding: inherit;
+            margin: inherit;
+            overflow: visible;
+            clip: auto;
+            white-space: normal;
+        }
+        
+        /* Live Region for Screen Readers */
+        .visually-hidden-live {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+        
+        /* Print Styles */
+        @media print {
+            .sidebar,
+            .sidebar-toggle,
+            .sidebar-overlay,
+            .top-bar,
+            .btn,
+            nav,
+            footer {
+                display: none !important;
+            }
+            
+            .main-content {
+                margin-left: 0 !important;
+                padding: 0 !important;
+            }
+            
+            body {
+                background: white !important;
+                color: black !important;
+            }
+            
+            .card {
+                box-shadow: none !important;
+                border: 1px solid #ddd !important;
+            }
+            
+            a {
+                text-decoration: underline;
+            }
+            
+            a[href]::after {
+                content: " (" attr(href) ")";
+                font-size: 0.8em;
+                color: #666;
+            }
+        }
+        
+        /* Touch Target Size (Mobile) */
+        @media (pointer: coarse) {
+            .btn,
+            .nav-link,
+            .notification-btn,
+            .sidebar-toggle {
+                min-height: 44px;
+                min-width: 44px;
+            }
+        }
+        
+        /* Zoom Support */
+        @media (min-resolution: 192dpi) {
+            /* Retina display support */
+            .logo-icon {
+                background-size: contain;
+            }
+        }
+
+        /* ===== BASE STYLES ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background-color: #f1f5f9;
+            color: #1e293b;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ===== CUSTOM SCROLLBAR ===== */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        /* ===== ANIMATIONS ===== */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes slideInLeft {
+            from { transform: translateX(-100%); }
+            to { transform: translateX(0); }
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+
+        /* ===== SIDEBAR ===== */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: var(--sidebar-width);
+            height: 100vh;
+            background: linear-gradient(180deg, #1e293b 0%, #334155 100%);
+            z-index: 1040;
+            transition: all var(--transition-speed) ease;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .sidebar-header h4 {
+            color: white;
+            font-weight: 700;
+            margin: 0;
+            font-size: 1.3rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .sidebar-header .logo-icon {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, var(--primary), #8b5cf6);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+
+        .sidebar .nav-link {
+            color: #cbd5e1;
+            padding: 12px 20px;
+            margin: 2px 12px;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+            font-weight: 500;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            position: relative;
+        }
+
+        .sidebar .nav-link:hover {
+            color: white;
+            background: rgba(255,255,255,0.1);
+            transform: translateX(3px);
+        }
+
+        .sidebar .nav-link.active {
+            color: white;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+        }
+
+        .sidebar .nav-link i {
+            font-size: 1.1rem;
+            width: 20px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        .sidebar .nav-link .badge {
+            position: absolute;
+            right: 12px;
+            font-size: 0.7rem;
+            padding: 3px 8px;
+        }
+
+        .sidebar-section {
+            padding: 10px 20px 5px;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            color: #64748b;
+            letter-spacing: 1px;
+            font-weight: 600;
+        }
+
+        .sidebar hr {
+            border-color: rgba(255,255,255,0.1);
+            margin: 10px 12px;
+        }
+
+        /* ===== SIDEBAR COLLAPSE ===== */
+        .sidebar-collapsed {
+            width: var(--sidebar-collapsed);
+        }
+        .sidebar-collapsed .sidebar-header h4 span {
+            display: none;
+        }
+        .sidebar-collapsed .nav-link span {
+            display: none;
+        }
+        .sidebar-collapsed .sidebar-section {
+            display: none;
+        }
+
+        /* ===== MAIN CONTENT ===== */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            padding: 20px 30px;
+            min-height: 100vh;
+            transition: margin-left var(--transition-speed) ease;
+        }
+
+        /* ===== TOP BAR ===== */
+        .top-bar {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 15px 25px;
+            margin-bottom: 25px;
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            animation: fadeInUp 0.5s ease;
+        }
+
+        .top-bar .search-box {
+            flex: 1;
+            max-width: 400px;
+            position: relative;
+        }
+
+        .top-bar .search-box input {
+            width: 100%;
+            padding: 10px 15px 10px 40px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            transition: all 0.2s ease;
+            background: #f8fafc;
+        }
+
+        .top-bar .search-box input:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: white;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .top-bar .search-box i {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #94a3b8;
+        }
+
+        .top-bar .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .top-bar .notification-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            border: none;
+            background: #f1f5f9;
+            color: #64748b;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .top-bar .notification-btn:hover {
+            background: #e2e8f0;
+            color: var(--primary);
+        }
+
+        .top-bar .notification-btn .dot {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 8px;
+            height: 8px;
+            background: var(--danger);
+            border-radius: 50%;
+        }
+
+        .top-bar .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--primary), #8b5cf6);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+
+        /* ===== CARDS ===== */
+        .card {
+            border: none;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-sm);
+            transition: all 0.3s ease;
+            overflow: hidden;
+        }
+
+        .card:hover {
+            box-shadow: var(--shadow-md);
+        }
+
+        .card-header {
+            background: white;
+            border-bottom: 1px solid #e2e8f0;
+            padding: 18px 24px;
+            font-weight: 600;
+        }
+
+        .card-body {
+            padding: 24px;
+        }
+
+        /* ===== BUTTONS ===== */
+        .btn {
+            border-radius: 8px;
+            padding: 10px 20px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            border: none;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, var(--success), #059669);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        }
+
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+        }
+
+        /* ===== TABLES ===== */
+        .table {
+            margin-bottom: 0;
+        }
+
+        .table thead th {
+            background: #f8fafc;
+            border-bottom: 2px solid #e2e8f0;
+            font-weight: 600;
+            color: #475569;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.5px;
+            padding: 14px 16px;
+        }
+
+        .table tbody td {
+            padding: 14px 16px;
+            vertical-align: middle;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .table tbody tr {
+            transition: background-color 0.15s ease;
+        }
+
+        .table tbody tr:hover {
+            background: #f8fafc;
+        }
+
+        /* ===== BADGES ===== */
+        .badge {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-weight: 500;
+            font-size: 0.75rem;
+        }
+
+        /* ===== ALERTS ===== */
+        .alert {
+            border: none;
+            border-radius: var(--border-radius);
+            padding: 16px 20px;
+            box-shadow: var(--shadow-sm);
+            animation: fadeInUp 0.3s ease;
+        }
+
+        /* ===== TOAST NOTIFICATIONS ===== */
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+        }
+
+        .toast {
+            min-width: 320px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-lg);
+            border: none;
+            overflow: hidden;
+        }
+
+        .toast .toast-body {
+            padding: 16px 20px;
+            font-weight: 500;
+        }
+
+        /* ===== SKELETON LOADING ===== */
+        .skeleton {
+            background: linear-gradient(90deg, #e2e8f0 25%, #f1f5f9 50%, #e2e8f0 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+            border-radius: 6px;
+        }
+
+        /* ===== PAGINATION ===== */
+        .pagination .page-link {
+            border: none;
+            color: #64748b;
+            padding: 8px 14px;
+            margin: 0 3px;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .pagination .page-link:hover {
+            background: #f1f5f9;
+            color: var(--primary);
+        }
+
+        .pagination .page-item.active .page-link {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+        }
+
+        /* ===== FORMS ===== */
+        .form-control, .form-select {
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 10px 14px;
+            transition: all 0.2s ease;
+            font-size: 0.9rem;
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .form-label {
+            font-weight: 500;
+            color: #475569;
+            margin-bottom: 6px;
+            font-size: 0.85rem;
+        }
+
+        /* ===== MOBILE SIDEBAR TOGGLE ===== */
+        .sidebar-toggle {
+            display: none;
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            border: none;
+            font-size: 1.3rem;
+            z-index: 1050;
+            box-shadow: var(--shadow-lg);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar-toggle:hover {
+            transform: scale(1.1);
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            .sidebar.show {
+                transform: translateX(0);
+            }
+            .main-content {
+                margin-left: 0;
+                padding: 15px;
+            }
+            .sidebar-toggle {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            .top-bar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .top-bar .search-box {
+                max-width: none;
+            }
+        }
+
+        /* ===== OVERLAY ===== */
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1035;
+        }
+
+        .sidebar-overlay.show {
+            display: block;
+        }
+
+    </style>
+</head>
+<body>
+    <!-- Skip Navigation Link -->
+    <a href="#main-content" class="skip-link">Langsung ka eusi utama</a>
+    
+    {% if user.is_authenticated %}
+    <!-- Sidebar Overlay (mobile) -->
+    <div class="sidebar-overlay" id="sidebarOverlay" role="dialog" aria-label="Menu overlay"></div>
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar" role="navigation" aria-label="Menu utama">
+        <div class="sidebar-header">
+            <h4>
+                <div class="logo-icon" aria-hidden="true">
+                    <i class="bi bi-hospital"></i>
+                </div>
+                <span>Klinik</span>
+            </h4>
+        </div>
+        <ul class="nav flex-column mt-3" role="menubar" aria-label="Menu navigasi utama">
+            <li class="nav-item" role="none">
+                <a class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}" href="{% url 'dashboard' %}" role="menuitem" aria-current="{% if request.resolver_match.url_name == 'dashboard' %}page{% endif %}">
+                    <i class="bi bi-speedometer2" aria-hidden="true"></i>
+                    <span>Dashboard</span>
+                </a>
+            </li>
+            <li class="sidebar-section mt-3" role="separator">Manajemen</li>
+            <li class="nav-item" role="none">
+                <a class="nav-link {% if 'patient' in request.resolver_match.url_name %}active{% endif %}" href="{% url 'patient_list' %}" role="menuitem" aria-current="{% if 'patient' in request.resolver_match.url_name %}page{% endif %}">
+                    <i class="bi bi-people" aria-hidden="true"></i>
+                    <span>Pasien</span>
+                </a>
+            </li>
+            <li class="nav-item" role="none">
+                <a class="nav-link {% if 'doctor' in request.resolver_match.url_name and 'dashboard' not in request.resolver_match.url_name %}active{% endif %}" href="{% url 'doctor_list' %}" role="menuitem" aria-current="{% if 'doctor' in request.resolver_match.url_name and 'dashboard' not in request.resolver_match.url_name %}page{% endif %}">
+                    <i class="bi bi-person-badge" aria-hidden="true"></i>
+                    <span>Dokter</span>
+                </a>
+            </li>
+            {% if user.is_authenticated and user.role == 'admin' %}
+            <li class="nav-item" role="none">
+                <a class="nav-link {% if 'user' in request.resolver_match.url_name %}active{% endif %}" href="{% url 'user_list' %}" role="menuitem" aria-current="{% if 'user' in request.resolver_match.url_name %}page{% endif %}">
+                    <i class="bi bi-person-gear" aria-hidden="true"></i>
+                    <span>Pengguna</span>
+                </a>
+            </li>
+            {% endif %}
+            {% if user.is_authenticated %}
+            {% with user.doctor_profile as d %}
+            {% if d %}
+            <li class="nav-item" role="none">
+                <a class="nav-link {% if request.resolver_match.url_name == 'doctor_dashboard' %}active{% endif %}" href="{% url 'doctor_dashboard' d.pk %}" role="menuitem" aria-current="{% if request.resolver_match.url_name == 'doctor_dashboard' %}page{% endif %}">
+                    <i class="bi bi-speedometer2" aria-hidden="true"></i>
+                    <span>Dashboard Dokter</span>
+                </a>
+            </li>
+            {% endif %}
+            {% endwith %}
+            {% endif %}
+            <li class="nav-item" role="none">
+                <a class="nav-link {% if 'appointment' in request.resolver_match.url_name %}active{% endif %}" href="{% url 'appointment_list' %}" role="menuitem" aria-current="{% if 'appointment' in request.resolver_match.url_name %}page{% endif %}">
+                    <i class="bi bi-calendar-check" aria-hidden="true"></i>
+                    <span>Appointment</span>
+                </a>
+            </li>
+            <li class="nav-item" role="none">
+                <a class="nav-link {% if 'prescription' in request.resolver_match.url_name %}active{% endif %}" href="{% url 'prescription_list' %}" role="menuitem" aria-current="{% if 'prescription' in request.resolver_match.url_name %}page{% endif %}">
+                    <i class="bi bi-prescription2" aria-hidden="true"></i>
+                    <span>Resep</span>
+                </a>
+            </li>
+            <li class="nav-item" role="none">
+                <a class="nav-link {% if 'medicine' in request.resolver_match.url_name %}active{% endif %}" href="{% url 'medicine_list' %}" role="menuitem" aria-current="{% if 'medicine' in request.resolver_match.url_name %}page{% endif %}">
+                    <i class="bi bi-box-seam" aria-hidden="true"></i>
+                    <span>Obat</span>
+                </a>
+            </li>
+            <li class="sidebar-section mt-3" role="separator">Keuangan</li>
+            <li class="nav-item" role="none">
+                <a class="nav-link {% if 'invoice' in request.resolver_match.url_name %}active{% endif %}" href="{% url 'invoice_list' %}" role="menuitem" aria-current="{% if 'invoice' in request.resolver_match.url_name %}page{% endif %}">
+                    <i class="bi bi-receipt" aria-hidden="true"></i>
+                    <span>Invoice</span>
+                </a>
+            </li>
+            <li class="nav-item" role="none">
+                <a class="nav-link {% if 'payment' in request.resolver_match.url_name %}active{% endif %}" href="{% url 'payment_list' %}" role="menuitem" aria-current="{% if 'payment' in request.resolver_match.url_name %}page{% endif %}">
+                    <i class="bi bi-cash" aria-hidden="true"></i>
+                    <span>Pembayaran</span>
+                </a>
+            </li>
+            <li class="sidebar-section mt-3" role="separator">Laporan</li>
+            <li class="nav-item" role="none">
+                <a class="nav-link {% if 'report' in request.resolver_match.url_name %}active{% endif %}" href="{% url 'report' %}" role="menuitem" aria-current="{% if 'report' in request.resolver_match.url_name %}page{% endif %}">
+                    <i class="bi bi-graph-up" aria-hidden="true"></i>
+                    <span>Laporan</span>
+                </a>
+            </li>
+            {% if user.is_authenticated %}
+            <li class="sidebar-section mt-3" role="separator">Akun</li>
+            <li class="nav-item" role="none">
+                <a class="nav-link {% if request.resolver_match.url_name == 'change_password' %}active{% endif %}" href="{% url 'change_password' %}" role="menuitem" aria-current="{% if request.resolver_match.url_name == 'change_password' %}page{% endif %}">
+                    <i class="bi bi-key-fill" aria-hidden="true"></i>
+                    <span>Robah Password</span>
+                </a>
+            </li>
+            <li class="nav-item" role="none">
+                <a class="nav-link" href="{% url 'logout' %}" role="menuitem">
+                    <i class="bi bi-box-arrow-right" aria-hidden="true"></i>
+                    <span>Logout</span>
+                </a>
+            </li>
+            {% endif %}
+        </ul>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content" id="main-content" role="main" aria-label="Eusi utama">
+        <!-- Top Bar -->
+        <header class="top-bar" role="banner">
+            <div class="search-box">
+                <i class="bi bi-search" aria-hidden="true"></i>
+                <input type="search" placeholder="Milarian..." id="globalSearch" aria-label="Milarian data">
+            </div>
+            <div class="user-menu">
+                <button class="notification-btn" title="Notifikasi" aria-label="Lihat notifikasi">
+                    <i class="bi bi-bell" aria-hidden="true"></i>
+                    <span class="dot" aria-hidden="true"></span>
+                    <span class="sr-only">Notifikasi anyar</span>
+                </button>
+                <div class="user-avatar" title="{{ user.get_full_name|default:user.username }}" aria-label="Profil {{ user.get_full_name|default:user.username }}">
+                    {{ user.first_name|slice:":1"|upper|default:user.username|slice:":1"|upper }}
+                </div>
+            </div>
+        </header>
+
+        {% if messages %}
+        <div class="mt-3" role="alert" aria-live="assertive">
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
+                <i class="bi {% if message.tags == 'success' %}bi-check-circle-fill{% elif message.tags == 'error' %}bi-exclamation-circle-fill{% elif message.tags == 'warning' %}bi-exclamation-triangle-fill{% else %}bi-info-circle-fill{% endif %} me-2" aria-hidden="true"></i>
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Tutup pesen"></button>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Mobile Sidebar Toggle -->
+    <button class="sidebar-toggle" id="sidebarToggle" aria-label="Buka menu navigasi" aria-expanded="false">
+        <i class="bi bi-list" aria-hidden="true"></i>
+    </button>
+    {% endif %}
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous"></script>
+    <script>
+        // ===== ACCESSIBILITY ENHANCEMENTS =====
+        
+        // Keyboard Navigation - Escape to close sidebar
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                const sidebar = document.getElementById('sidebar');
+                const overlay = document.getElementById('sidebarOverlay');
+                const toggle = document.getElementById('sidebarToggle');
+                
+                if (sidebar && sidebar.classList.contains('show')) {
+                    sidebar.classList.remove('show');
+                    if (overlay) overlay.classList.remove('show');
+                    if (toggle) toggle.setAttribute('aria-expanded', 'false');
+                    toggle?.focus();
+                }
+            }
+        });
+
+        // Sidebar Toggle (Mobile) with ARIA
+        const sidebar = document.getElementById('sidebar');
+        const sidebarToggle = document.getElementById('sidebarToggle');
+        const sidebarOverlay = document.getElementById('sidebarOverlay');
+
+        if (sidebarToggle) {
+            sidebarToggle.addEventListener('click', () => {
+                const isOpen = sidebar.classList.toggle('show');
+                if (sidebarOverlay) sidebarOverlay.classList.toggle('show');
+                sidebarToggle.setAttribute('aria-expanded', isOpen.toString());
+                sidebarToggle.setAttribute('aria-label', isOpen ? 'Nutup menu navigasi' : 'Buka menu navigasi');
+            });
+        }
+
+        if (sidebarOverlay) {
+            sidebarOverlay.addEventListener('click', () => {
+                sidebar.classList.remove('show');
+                sidebarOverlay.classList.remove('show');
+                sidebarToggle.setAttribute('aria-expanded', 'false');
+                sidebarToggle.setAttribute('aria-label', 'Buka menu navigasi');
+            });
+        }
+
+        // Trap focus within sidebar when open on mobile
+        function trapFocus(element) {
+            const focusableElements = element.querySelectorAll(
+                'a[href], button:not([disabled]), input, select, textarea, [tabindex]:not([tabindex="-1"])'
+            );
+            const firstFocusable = focusableElements[0];
+            const lastFocusable = focusableElements[focusableElements.length - 1];
+            
+            element.addEventListener('keydown', (e) => {
+                if (e.key === 'Tab') {
+                    if (e.shiftKey) {
+                        if (document.activeElement === firstFocusable) {
+                            lastFocusable.focus();
+                            e.preventDefault();
+                        }
+                    } else {
+                        if (document.activeElement === lastFocusable) {
+                            firstFocusable.focus();
+                            e.preventDefault();
+                        }
+                    }
+                }
+            });
+        }
+
+        // Auto-hide alerts after 5 seconds
+        document.addEventListener('DOMContentLoaded', () => {
+            const alerts = document.querySelectorAll('.alert-dismissible');
+            alerts.forEach(alert => {
+                setTimeout(() => {
+                    const bsAlert = new bootstrap.Alert(alert);
+                    bsAlert.close();
+                }, 5000);
+            });
+
+            // Add fade-in animation to content
+            const content = document.querySelector('.main-content');
+            if (content) {
+                content.style.opacity = '0';
+                content.style.transform = 'translateY(10px)';
+                content.style.transition = 'all 0.5s ease';
+                setTimeout(() => {
+                    content.style.opacity = '1';
+                    content.style.transform = 'translateY(0)';
+                }, 100);
+            }
+            
+            // Add ARIA labels to tables
+            document.querySelectorAll('table').forEach(table => {
+                if (!table.getAttribute('aria-label')) {
+                    const caption = table.querySelector('caption');
+                    if (caption) {
+                        table.setAttribute('aria-label', caption.textContent);
+                    }
+                }
+            });
+            
+            // Announce page title changes to screen readers
+            const observer = new MutationObserver((mutations) => {
+                mutations.forEach((mutation) => {
+                    if (mutation.type === 'childList' && mutation.target.tagName === 'TITLE') {
+                        const announcer = document.getElementById('aria-live-region');
+                        if (announcer) {
+                            announcer.textContent = document.title;
+                        }
+                    }
+                });
+            });
+            
+            const titleElement = document.querySelector('title');
+            if (titleElement) {
+                observer.observe(titleElement, { childList: true });
+            }
+        });
+        
+        // Create live region for screen reader announcements
+        document.addEventListener('DOMContentLoaded', () => {
+            const liveRegion = document.createElement('div');
+            liveRegion.id = 'aria-live-region';
+            liveRegion.className = 'visually-hidden-live';
+            liveRegion.setAttribute('role', 'status');
+            liveRegion.setAttribute('aria-live', 'polite');
+            document.body.appendChild(liveRegion);
+        });
+    </script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

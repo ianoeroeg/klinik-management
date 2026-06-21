@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% block title %}{{ form.instance.pk|yesno:"Edit Appointment,Tambah Appointment" }} - Klinik{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="bi bi-calendar-plus"></i> {{ form.instance.pk|yesno:"Edit Appointment,Tambah Appointment" }}</h2>
+    <a href="{% url 'appointment_list' %}" class="btn btn-secondary">
+        <i class="bi bi-arrow-left"></i> Balik
+    </a>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-body">
+        <form method="post" novalidate>
+            {% csrf_token %}
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Pasien</label>
+                    <select class="form-control" required
+                            aria-describedby="pasienHelp">
+                        <option value="">Pilih pasien...</option>
+                    </select>
+                    <div id="pasienHelp" class="form-text">Pilih pasien anu kudu diappointment</div>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Dokter</label>
+                    <select class="form-control" required
+                            aria-describedby="dokterHelp">
+                        <option value="">Pilih dokter...</option>
+                    </select>
+                    <div id="dokterHelp" class="form-text">Pilih dokter anu sayogi</div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <label class="form-label">Tanggal</label>
+                    <input type="date" class="form-control" required
+                           aria-describedby="tanggalHelp">
+                    <div id="tanggalHelp" class="form-text">Format: YYYY-MM-DD</div>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label class="form-label">Waktu</label>
+                    <input type="time" class="form-control" required
+                           aria-describedby="waktuHelp">
+                    <div id="waktuHelp" class="form-text">Format: HH:MM</div>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label class="form-label">Prioritas</label>
+                    <select class="form-control">
+                        <option value="normal">Normal</option>
+                        <option value="urgent">Urgent</option>
+                        <option value="emergency">Darurat</option>
+                    </select>
+                </div>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Alasan Kunjungan</label>
+                <textarea class="form-control" rows="3" required
+                          minlength="10" maxlength="2000"
+                          aria-describedby="alasanHelp"></textarea>
+                <div id="alasanHelp" class="form-text">Jelaskeun alesan kunjungan (10-2000 karakter)</div>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Catetan</label>
+                <textarea class="form-control" rows="2"
+                          maxlength="1000"></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">
+                <i class="bi bi-check"></i> Simpen
+            </button>
+        </form>
+    </div>
+</div>
+{% endblock %}

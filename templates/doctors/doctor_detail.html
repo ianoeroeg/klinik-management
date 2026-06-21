@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}{{ doctor }} - Klinik{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="bi bi-person-badge"></i> Dr. {{ doctor.get_full_name }}</h2>
+    <a href="{% url 'doctor_list' %}" class="btn btn-secondary">
+        <i class="bi bi-arrow-left"></i> Balik
+    </a>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-6">
+                <p><strong>No. STR:</strong> {{ doctor.license_number }}</p>
+                <p><strong>Spesialisasi:</strong> {{ doctor.get_specialization_display }}</p>
+                <p><strong>Pendidikan:</strong> {{ doctor.education|default:"-" }}</p>
+                <p><strong>Pangalaman:</strong> {{ doctor.experience_years }} taun</p>
+            </div>
+            <div class="col-md-6">
+                <p><strong>Biaya Konsultasi:</strong> Rp {{ doctor.consultation_fee|floatformat:0 }}</p>
+                <p><strong>Tersedia:</strong>
+                    {% if doctor.is_available %}
+                    <span class="badge bg-success">Ya</span>
+                    {% else %}
+                    <span class="badge bg-secondary">Teu</span>
+                    {% endif %}
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,481 @@
+{% extends "base.html" %}
+{% block title %}Portal Pasien - Klinik{% endblock %}
+{% block extra_css %}
+<style>
+    .portal-header {
+        background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+        color: white;
+        padding: 30px;
+        border-radius: 15px;
+        margin-bottom: 30px;
+        box-shadow: 0 10px 30px rgba(17, 153, 142, 0.3);
+    }
+    
+    .portal-header h1 {
+        font-weight: 700;
+        margin-bottom: 10px;
+    }
+    
+    .portal-header p {
+        opacity: 0.9;
+        margin-bottom: 0;
+    }
+    
+    .profile-card {
+        border: none;
+        border-radius: 15px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+        overflow: hidden;
+    }
+    
+    .profile-avatar {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #11998e, #38ef7d);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2.5rem;
+        font-weight: bold;
+        margin: 0 auto 20px;
+    }
+    
+    .info-card {
+        border: none;
+        border-radius: 15px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+    }
+    
+    .info-card .card-header {
+        background: white;
+        border-bottom: 2px solid #f0f0f0;
+        padding: 20px;
+        font-weight: 600;
+        color: #2c3e50;
+    }
+    
+    .info-item {
+        padding: 12px 0;
+        border-bottom: 1px solid #f0f0f0;
+    }
+    
+    .info-item:last-child {
+        border-bottom: none;
+    }
+    
+    .info-label {
+        font-weight: 600;
+        color: #6c757d;
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .info-value {
+        color: #2c3e50;
+        font-size: 1rem;
+    }
+    
+    .appointment-card {
+        border: none;
+        border-radius: 15px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+        transition: all 0.3s ease;
+    }
+    
+    .appointment-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    }
+    
+    .appointment-time {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #11998e;
+    }
+    
+    .appointment-date {
+        font-size: 0.9rem;
+        color: #6c757d;
+    }
+    
+    .status-badge {
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-weight: 600;
+        font-size: 0.85rem;
+    }
+    
+    .status-scheduled { background-color: #d1ecf1; color: #0c5460; }
+    .status-in_progress { background-color: #fff3cd; color: #856404; }
+    .status-completed { background-color: #d4edda; color: #155724; }
+    .status-cancelled { background-color: #f8d7da; color: #721c24; }
+    
+    .invoice-card {
+        border: none;
+        border-radius: 15px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+    }
+    
+    .invoice-amount {
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: #2c3e50;
+    }
+    
+    .quick-action {
+        text-align: center;
+        padding: 25px 15px;
+        border-radius: 15px;
+        background: white;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+        transition: all 0.3s ease;
+        text-decoration: none;
+        color: #2c3e50;
+    }
+    
+    .quick-action:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        color: #2c3e50;
+    }
+    
+    .quick-action i {
+        font-size: 2.5rem;
+        margin-bottom: 10px;
+    }
+    
+    .quick-action .action-label {
+        font-weight: 600;
+    }
+    
+    .prescription-card {
+        border: none;
+        border-radius: 15px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+    }
+    
+    .medicine-item {
+        padding: 10px 0;
+        border-bottom: 1px solid #f0f0f0;
+    }
+    
+    .medicine-item:last-child {
+        border-bottom: none;
+    }
+    
+    .medicine-name {
+        font-weight: 600;
+        color: #2c3e50;
+    }
+    
+    .medicine-dosage {
+        color: #6c757d;
+        font-size: 0.9rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Portal Header -->
+<div class="portal-header">
+    <div class="row align-items-center">
+        <div class="col">
+            <h1><i class="bi bi-person-circle"></i> Portal Pasien</h1>
+            <p>Selamat datang, {{ patient.user.get_full_name }}! Ieu portal pikeun ngatur kaséhatan anjeun.</p>
+        </div>
+        <div class="col-auto">
+            <div class="text-end">
+                <small>{{ now|date:"l, d F Y" }}</small><br>
+                <small>{{ now|date:"H:i" }} WIB</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="row mb-4">
+    <div class="col-6 col-md-3 mb-3">
+        <a href="{% url 'patient_portal_appointment_create' %}" class="quick-action">
+            <i class="bi bi-calendar-plus text-success"></i>
+            <div class="action-label">Buat Appointment</div>
+        </a>
+    </div>
+    <div class="col-6 col-md-3 mb-3">
+        <a href="#appointments" class="quick-action">
+            <i class="bi bi-calendar-check text-primary"></i>
+            <div class="action-label">Jadwal Saya</div>
+        </a>
+    </div>
+    <div class="col-6 col-md-3 mb-3">
+        <a href="#invoices" class="quick-action">
+            <i class="bi bi-receipt text-warning"></i>
+            <div class="action-label">Invoice</div>
+        </a>
+    </div>
+    <div class="col-6 col-md-3 mb-3">
+        <a href="#prescriptions" class="quick-action">
+            <i class="bi bi-prescription2 text-info"></i>
+            <div class="action-label">Resep Obat</div>
+        </a>
+    </div>
+</div>
+
+<!-- Profile Overview -->
+<div class="row mb-4">
+    <div class="col-md-4 mb-4">
+        <div class="card profile-card">
+            <div class="card-body text-center">
+                <div class="profile-avatar">
+                    {{ patient.user.first_name|default:patient.user.username|slice:":1"|upper }}
+                </div>
+                <h4>{{ patient.user.get_full_name }}</h4>
+                <p class="text-muted">Pasien</p>
+                <a href="{% url 'patient_edit' patient.pk %}" class="btn btn-outline-primary btn-sm">
+                    <i class="bi bi-pencil"></i> Edit Profil
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-8 mb-4">
+        <div class="card info-card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span><i class="bi bi-person"></i> Informasi Pribadi</span>
+                <a href="{% url 'patient_edit' patient.pk %}" class="btn btn-sm btn-outline-primary">Edit</a>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="info-item">
+                            <div class="info-label">NIK</div>
+                            <div class="info-value">{{ patient.nik }}</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Tanggal Lahir</div>
+                            <div class="info-value">{{ patient.date_of_birth }}</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Umur</div>
+                            <div class="info-value">{{ patient.age }} taun</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="info-item">
+                            <div class="info-label">Jenis Kalamin</div>
+                            <div class="info-value">{{ patient.get_gender_display }}</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Golongan Darah</div>
+                            <div class="info-value">{{ patient.blood_type|default:"-" }}</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Telepon</div>
+                            <div class="info-value">{{ patient.phone|default:"-" }}</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Alamat</div>
+                    <div class="info-value">{{ patient.address }}</div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="info-item">
+                            <div class="info-label">Kontak Darurat</div>
+                            <div class="info-value">{{ patient.emergency_contact|default:"-" }}</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="info-item">
+                            <div class="info-label">No. Darurat</div>
+                            <div class="info-value">{{ patient.emergency_phone|default:"-" }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Upcoming Appointments -->
+<div class="row mb-4" id="appointments">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span><i class="bi bi-calendar-check"></i> Appointment Anjeun</span>
+                <a href="{% url 'patient_portal_appointment_create' %}" class="btn btn-sm btn-success">
+                    <i class="bi bi-plus"></i> Buat Anyar
+                </a>
+            </div>
+            <div class="card-body p-0">
+                {% if upcoming_appointments %}
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th>Tanggal</th>
+                                <th>Waktu</th>
+                                <th>Dokter</th>
+                                <th>Spesialisasi</th>
+                                <th>Status</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for appt in upcoming_appointments %}
+                            <tr>
+                                <td>{{ appt.appointment_date|date:"d M Y" }}</td>
+                                <td>{{ appt.appointment_time|time:"H:i" }}</td>
+                                <td>{{ appt.doctor.user.get_full_name }}</td>
+                                <td>{{ appt.doctor.get_specialization_display }}</td>
+                                <td>
+                                    <span class="status-badge status-{{ appt.status }}">
+                                        {{ appt.get_status_display }}
+                                    </span>
+                                </td>
+                                <td>
+                                    {% if appt.status == 'scheduled' %}
+                                    <a href="{% url 'appointment_detail' appt.pk %}" class="btn btn-sm btn-info">
+                                        <i class="bi bi-eye"></i> Detail
+                                    </a>
+                                    <a href="{% url 'appointment_delete' appt.pk %}" class="btn btn-sm btn-danger"
+                                       onclick="return confirm('Yakin hayu ngabolaykeun appointment ieu?')">
+                                        <i class="bi bi-trash"></i>
+                                    </a>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center text-muted py-4">
+                    <i class="bi bi-calendar-x" style="font-size: 2rem;"></i>
+                    <p class="mt-2">Anjeun teu aya appointment anu bakal datang.</p>
+                    <a href="{% url 'patient_portal_appointment_create' %}" class="btn btn-success mt-2">
+                        <i class="bi bi-plus"></i> Buat Appointment
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Invoice History -->
+<div class="row mb-4" id="invoices">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <i class="bi bi-receipt"></i> Riwayat Invoice
+            </div>
+            <div class="card-body p-0">
+                {% if invoices %}
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th>No. Invoice</th>
+                                <th>Tanggal</th>
+                                <th>Total</th>
+                                <th>Status</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for inv in invoices %}
+                            <tr>
+                                <td>{{ inv.invoice_number }}</td>
+                                <td>{{ inv.created_at|date:"d M Y" }}</td>
+                                <td>Rp {{ inv.total|floatformat:0 }}</td>
+                                <td>
+                                    <span class="status-badge bg-{{ inv.status|yesno:'success,warning,danger,secondary' }}">
+                                        {{ inv.get_status_display }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <a href="{% url 'invoice_detail' inv.pk %}" class="btn btn-sm btn-info">
+                                        <i class="bi bi-eye"></i> Detail
+                                    </a>
+                                    {% if inv.status != 'paid' %}
+                                    <a href="{% url 'payment_create' inv.pk %}" class="btn btn-sm btn-success">
+                                        <i class="bi bi-cash"></i> Bayar
+                                    </a>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center text-muted py-4">
+                    <i class="bi bi-receipt" style="font-size: 2rem;"></i>
+                    <p class="mt-2">Teu aya invoice.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Prescription History -->
+<div class="row mb-4" id="prescriptions">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <i class="bi bi-prescription2"></i> Riwayat Resep
+            </div>
+            <div class="card-body p-0">
+                {% if prescriptions %}
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th>Tanggal</th>
+                                <th>Dokter</th>
+                                <th>Appointment</th>
+                                <th>Obat</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for rx in prescriptions %}
+                            <tr>
+                                <td>{{ rx.created_at|date:"d M Y" }}</td>
+                                <td>{{ rx.doctor.user.get_full_name }}</td>
+                                <td>{{ rx.appointment.appointment_date|date:"d M Y" }}</td>
+                               <td>
+                                    {% for item in rx.items.all %}
+                                    <div class="medicine-item">
+                                        <div class="medicine-name">{{ item.medicine.name }}</div>
+                                        <div class="medicine-dosage">{{ item.dosage }} - {{ item.frequency }} - {{ item.duration }}</div>
+                                    </div>
+                                    {% endfor %}
+                                </td>
+                                <td>
+                                    <a href="{% url 'prescription_detail' rx.pk %}" class="btn btn-sm btn-info">
+                                        <i class="bi bi-eye"></i> Detail
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center text-muted py-4">
+                    <i class="bi bi-prescription2" style="font-size: 2rem;"></i>
+                    <p class="mt-2">Teu aya resep.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

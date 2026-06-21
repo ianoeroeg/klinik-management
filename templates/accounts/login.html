@@ -1,0 +1,29 @@
+{% extends "base_auth.html" %}
+{% block title %}Login - Klinik{% endblock %}
+{% block auth_body %}
+<div class="card shadow">
+    <div class="card-body p-4">
+        <h3 class="text-center mb-4"><i class="bi bi-box-arrow-in-right"></i> Login</h3>
+        <form method="post" novalidate>
+            {% csrf_token %}
+            <div class="mb-3">
+                <label for="username" class="form-label">Username</label>
+                <input type="text" class="form-control" id="username" name="username" required
+                       minlength="3" maxlength="150"
+                       pattern="[a-zA-Z0-9_]+"
+                       title="Username ngan bisa ngandung huruf, angka, jeung underscore"
+                       aria-describedby="usernameHelp">
+                <div id="usernameHelp" class="form-text">Huruf, angka, jeung underscore wé (3-150 karakter)</div>
+            </div>
+            <div class="mb-3">
+                <label for="password" class="form-label">Password</label>
+                <input type="password" class="form-control" id="password" name="password" required
+                       minlength="8"
+                       aria-describedby="passwordHelp">
+                <div id="passwordHelp" class="form-text">Minimum 8 karakter</div>
+            </div>
+            <button type="submit" class="btn btn-primary w-100">Login</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

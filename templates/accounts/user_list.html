@@ -1,0 +1,240 @@
+{% extends "base.html" %}
+{% block title %}Daptar Pengguna - Klinik{% endblock %}
+{% block extra_css %}
+<style>
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 25px;
+        animation: fadeInUp 0.5s ease;
+    }
+    .page-header h2 {
+        font-weight: 700;
+        color: #1e293b;
+        margin: 0;
+    }
+    .filter-bar {
+        background: white;
+        border-radius: var(--border-radius);
+        padding: 20px;
+        margin-bottom: 20px;
+        box-shadow: var(--shadow-sm);
+        display: flex;
+        gap: 15px;
+        flex-wrap: wrap;
+        align-items: center;
+        animation: fadeInUp 0.5s ease 0.1s both;
+    }
+    .filter-bar .form-select, .filter-bar .form-control {
+        min-width: 180px;
+    }
+    .role-badge {
+        padding: 4px 14px;
+        border-radius: 20px;
+        font-size: 0.78rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    .role-admin { background: #ede9fe; color: #6d28d9; }
+    .role-dokter { background: #d1fae5; color: #065f46; }
+    .role-staff { background: #dbeafe; color: #1e40af; }
+    .role-pasien { background: #fef3c7; color: #92400e; }
+    .user-avatar-sm {
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        font-size: 0.85rem;
+        flex-shrink: 0;
+    }
+    .user-avatar-sm img {
+        width: 100%;
+        height: 100%;
+        border-radius: 10px;
+        object-fit: cover;
+    }
+    .table-user td:first-child {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+    .action-btns .btn {
+        padding: 5px 10px;
+        font-size: 0.8rem;
+    }
+</style>
+{% endblock %}
+{% block content %}
+<div class="page-header">
+    <div>
+        <h2><i class="bi bi-people-fill me-2" aria-hidden="true"></i>Daptar Pengguna</h2>
+        <p class="text-muted mb-0">Kelola sadayana pengguna sistem klinik</p>
+    </div>
+    <div class="d-flex gap-2">
+        <a href="{% url 'export_users_csv' %}" class="btn btn-outline-success"
+           aria-label="Export data pengguna ka file CSV">
+            <i class="bi bi-download me-1" aria-hidden="true"></i> Export CSV
+        </a>
+        <a href="{% url 'user_create' %}" class="btn btn-primary"
+           aria-label="Tambah pengguna anyar">
+            <i class="bi bi-person-plus-fill me-1" aria-hidden="true"></i> Tambah Pengguna
+        </a>
+    </div>
+</div>
+
+<!-- Filter Bar -->
+<div class="filter-bar" role="search" aria-label="Filter jeung milarian pengguna">
+    <form method="get" style="display: flex; gap: 15px; flex-wrap: wrap; align-items: center; width: 100%;">
+        <div>
+            <label class="form-label" style="font-size: 0.8rem; margin-bottom: 4px;" for="filterRole">Role</label>
+            <select name="role" class="form-select" style="min-width: 150px;" id="filterRole"
+                    aria-describedby="filterRoleHelp">
+                <option value="">Sadaya Role</option>
+                <option value="admin" {% if selected_role == 'admin' %}selected{% endif %}>Admin</option>
+                <option value="dokter" {% if selected_role == 'dokter' %}selected{% endif %}>Dokter</option>
+                <option value="staff" {% if selected_role == 'staff' %}selected{% endif %}>Staff</option>
+                <option value="pasien" {% if selected_role == 'pasien' %}selected{% endif %}>Pasien</option>
+            </select>
+            <div id="filterRoleHelp" class="form-text" style="margin-top: 4px;">
+                Pilih role pikeun nyaring daptar pengguna
+            </div>
+        </div>
+        <div>
+            <label class="form-label" style="font-size: 0.8rem; margin-bottom: 4px;" for="filterSearch">Cari</label>
+            <input type="search" name="search" class="form-control" placeholder="Nama atawa username..." 
+                   value="{{ search_query }}" style="min-width: 200px;" id="filterSearch"
+                   aria-describedby="filterSearchHelp">
+            <div id="filterSearchHelp" class="form-text" style="margin-top: 4px;">
+                Milarian dumasar kana nama atawa username
+            </div>
+        </div>
+        <div class="d-flex align-items-end">
+            <button type="submit" class="btn btn-primary">
+                <i class="bi bi-search me-1" aria-hidden="true"></i> Filter
+            </button>
+            <a href="{% url 'user_list' %}" class="btn btn-outline-secondary ms-2">Reset</a>
+        </div>
+    </form>
+</div>
+
+<!-- Users Table -->
+<div class="card">
+    <div class="card-body p-0">
+        {% if users %}
+        <div class="table-responsive">
+            <table class="table table-user table-hover mb-0" aria-label="Daptar pengguna">
+                <caption class="sr-only">Daptar sadaya pengguna sistem klinik</caption>
+                <thead>
+                    <tr>
+                        <th scope="col" style="width: 280px;">Pengguna</th>
+                        <th scope="col">Email</th>
+                        <th scope="col">Role</th>
+                        <th scope="col">Telepon</th>
+                        <th scope="col">Dibuat</th>
+                        <th scope="col" style="width: 140px;">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user in users %}
+                    <tr>
+                        <td>
+                            <div class="user-avatar-sm" aria-hidden="true">
+                                {% if user.avatar %}
+                                    <img src="{{ user.avatar.url }}" alt="Avatar {{ user.get_full_name|default:user.username }}">
+                                {% else %}
+                                    {{ user.first_name|slice:":1"|upper|default:user.username|slice:":1"|upper }}
+                                {% endif %}
+                            </div>
+                            <div>
+                                <div class="fw-bold">{{ user.get_full_name|default:user.username }}</div>
+                                <div class="text-muted small">@{{ user.username }}</div>
+                            </div>
+                        </td>
+                        <td>{{ user.email|default:"—" }}</td>
+                        <td>
+                            <span class="role-badge role-{{ user.role }}" 
+                                  aria-label="Role: {{ user.get_role_display }}">
+                                {{ user.get_role_display }}
+                            </span>
+                        </td>
+                        <td>{{ user.phone|default:"—" }}</td>
+                        <td>{{ user.created_at|date:"d M Y" }}</td>
+                        <td class="action-btns">
+                            <a href="{% url 'user_detail' user.pk %}" class="btn btn-sm btn-outline-info" 
+                               title="Ningali detail" aria-label="Ningali detail {{ user.get_full_name|default:user.username }}">
+                                <i class="bi bi-eye" aria-hidden="true"></i>
+                            </a>
+                            <a href="{% url 'user_edit' user.pk %}" class="btn btn-sm btn-outline-primary" 
+                               title="Édit" aria-label="Édit {{ user.get_full_name|default:user.username }}">
+                                <i class="bi bi-pencil" aria-hidden="true"></i>
+                            </a>
+                            <a href="{% url 'user_delete' user.pk %}" class="btn btn-sm btn-outline-danger" 
+                               title="Hapus" aria-label="Hapus {{ user.get_full_name|default:user.username }}"
+                               onclick="return confirm('Hapus pengguna {{ user.get_full_name|default:user.username }}?')">
+                                <i class="bi bi-trash" aria-hidden="true"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="text-center py-5">
+            <i class="bi bi-people" style="font-size: 3rem; color: #cbd5e1;" aria-hidden="true"></i>
+            <p class="text-muted mt-3">Teu aya pengguna anu cocog.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Pagination -->
+{% if is_paginated %}
+<nav class="d-flex justify-content-center mt-4" aria-label="Navigasi halaman">
+    <ul class="pagination">
+        {% if page_obj.has_previous %}
+        <li class="page-item">
+            <a class="page-link" href="?page=1{% if selected_role %}&role={{ selected_role }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}"
+               aria-label="Halaman kahiji">
+                <i class="bi bi-chevron-double-left" aria-hidden="true"></i>
+            </a>
+        </li>
+        <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if selected_role %}&role={{ selected_role }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}"
+               aria-label="Halaman saméméhna">
+                <i class="bi bi-chevron-left" aria-hidden="true"></i>
+            </a>
+        </li>
+        {% endif %}
+        
+        <li class="page-item active" aria-current="page">
+            <span class="page-link">
+                Halaman {{ page_obj.number }}/{{ page_obj.paginator.num_pages }}
+            </span>
+        </li>
+        
+        {% if page_obj.has_next %}
+        <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if selected_role %}&role={{ selected_role }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}"
+               aria-label="Halaman saterusna">
+                <i class="bi bi-chevron-right" aria-hidden="true"></i>
+            </a>
+        </li>
+        <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if selected_role %}&role={{ selected_role }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}"
+               aria-label="Halaman terakhir">
+                <i class="bi bi-chevron-double-right" aria-hidden="true"></i>
+            </a>
+        </li>
+        {% endif %}
+    </ul>
+</nav>
+{% endif %}
+{% endblock %}

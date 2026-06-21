@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+{% block title %}Tambah Pengguna - Klinik{% endblock %}
+{% block extra_css %}
+<style>
+    .form-card {
+        max-width: 700px;
+        margin: 0 auto;
+    }
+    .form-header {
+        background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+        padding: 30px;
+        border-radius: var(--border-radius) var(--border-radius) 0 0;
+        color: white;
+    }
+    .form-header h3 {
+        font-weight: 700;
+        margin-bottom: 5px;
+    }
+    .form-body {
+        padding: 30px;
+    }
+    .required-field::after {
+        content: " *";
+        color: #ef4444;
+    }
+</style>
+{% endblock %}
+{% block content %}
+<div class="form-card">
+    <div class="form-header">
+        <h3><i class="bi bi-person-plus-fill me-2"></i>Tambah Pengguna Anyar</h3>
+        <p class="mb-0" style="opacity: 0.9;">Isi data pikeun nyieun akun pengguna anyar</p>
+    </div>
+    <div class="form-body">
+        <form method="post" novalidate>
+            {% csrf_token %}
+            
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label required-field">Username</label>
+                    <input type="text" name="username" class="form-control" 
+                           value="{{ form.username.value|default:'' }}" required
+                           minlength="3" maxlength="150"
+                           pattern="[a-zA-Z0-9_]+"
+                           title="Username ngan bisa ngandung huruf, angka, jeung underscore">
+                    {% if form.username.errors %}
+                    <div class="text-danger small">{{ form.username.errors|first }}</div>
+                    {% endif %}
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label required-field">Password</label>
+                    <input type="password" name="password" class="form-control" required
+                           minlength="8"
+                           aria-describedby="passwordLengthHelp">
+                    <div id="passwordLengthHelp" class="form-text">Minimum 8 karakter</div>
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label required-field">Nama Depan</label>
+                    <input type="text" name="first_name" class="form-control" 
+                           value="{{ form.first_name.value|default:'' }}" required
+                           maxlength="150">
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Nama Belakang</label>
+                    <input type="text" name="last_name" class="form-control" 
+                           value="{{ form.last_name.value|default:'' }}"
+                           maxlength="150">
+                </div>
+            </div>
+            
+            <div class="mb-3">
+                <label class="form-label required-field">Email</label>
+                <input type="email" name="email" class="form-control" 
+                       value="{{ form.email.value|default:'' }}" required
+                       maxlength="254"
+                       aria-describedby="emailHelp">
+                <div id="emailHelp" class="form-text">Format: nama@domain.com</div>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label required-field">Role</label>
+                    <select name="role" class="form-select" required>
+                        <option value="">— Pilih Role —</option>
+                        <option value="admin" {% if form.role.value == 'admin' %}selected{% endif %}>Administrator</option>
+                        <option value="dokter" {% if form.role.value == 'dokter' %}selected{% endif %}>Dokter</option>
+                        <option value="staff" {% if form.role.value == 'staff' %}selected{% endif %}>Staff</option>
+                        <option value="pasien" {% if form.role.value == 'pasien' %}selected{% endif %}>Pasien</option>
+                    </select>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Telepon</label>
+                    <input type="tel" name="phone" class="form-control" 
+                           value="{{ form.phone.value|default:'' }}" placeholder="+62..."
+                           pattern="[\+]?[0-9\s\-]{8,20}"
+                           title="Nomor telepon: 8-20 digit, bisa ngandung +, spasi, jeung tanda hubung">
+                </div>
+            </div>
+            
+            <div class="d-flex gap-2 mt-4">
+                <button type="submit" class="btn btn-primary flex-grow-1">
+                    <i class="bi bi-check-circle me-1"></i> Simpan Pengguna
+                </button>
+                <a href="{% url 'user_list' %}" class="btn btn-outline-secondary">
+                    <i class="bi bi-x-circle me-1"></i> Batal
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

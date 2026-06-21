@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block title %}{{ prescription }} - Klinik{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="bi bi-prescription2"></i> {{ prescription }}</h2>
+    <a href="{% url 'prescription_list' %}" class="btn btn-secondary">
+        <i class="bi bi-arrow-left"></i> Balik
+    </a>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-body">
+        <p><strong>Pasien:</strong> {{ prescription.appointment.patient }}</p>
+        <p><strong>Status:</strong>
+            <span class="badge bg-{{ prescription.status|yesno:'success,info,primary,danger' }}">
+                {{ prescription.get_status_display }}
+            </span>
+        </p>
+        <p><strong>Diagnosa:</strong></p>
+        <p>{{ prescription.diagnosis }}</p>
+        {% if prescription.treatment_notes %}
+        <p><strong>Pangobatan:</strong></p>
+        <p>{{ prescription.treatment_notes }}</p>
+        {% endif %}
+        <hr>
+        <h5><i class="bi bi-box-seam"></i> Item Resep</h5>
+        <table class="table table-sm">
+            <thead>
+                <tr>
+                    <th>Obat</th>
+                    <th>Dosis</th>
+                    <th>Kadaliwuran</th>
+                    <th>Durasian</th>
+                    <th>Jumlah</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in prescription.items.all %}
+                <tr>
+                    <td>{{ item.medicine }}</td>
+                    <td>{{ item.dosage }}</td>
+                    <td>{{ item.frequency }}</td>
+                    <td>{{ item.duration }}</td>
+                    <td>{{ item.quantity }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="text-center text-muted">Belum aya item resep.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

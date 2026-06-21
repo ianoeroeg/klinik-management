@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% block title %}{{ form.instance.pk|yesno:"Edit Pasien,Tambah Pasien" }} - Klinik{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="bi bi-person-plus"></i> {{ form.instance.pk|yesno:"Edit Pasien,Tambah Pasien" }}</h2>
+    <a href="{% url 'patient_list' %}" class="btn btn-secondary">
+        <i class="bi bi-arrow-left"></i> Balik
+    </a>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-body">
+        <form method="post" novalidate>
+            {% csrf_token %}
+            <div class="mb-3">
+                <label class="form-label">Ngaran</label>
+                <input type="text" class="form-control" placeholder="Ngaran lengkep" required
+                       minlength="2" maxlength="200"
+                       aria-describedby="namaHelp">
+                <div id="namaHelp" class="form-text">2-200 karakter</div>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">NIK</label>
+                <input type="text" class="form-control" required
+                       pattern="[0-9]{16}" maxlength="16"
+                       title="NIK kudu 16 digit angka"
+                       aria-describedby="nikHelp">
+                <div id="nikHelp" class="form-text">16 digit angka</div>
+            </div>
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <label class="form-label">Tanggal Lahir</label>
+                    <input type="date" class="form-control" required
+                           aria-describedby="dobHelp">
+                    <div id="dobHelp" class="form-text">Format: YYYY-MM-DD</div>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label class="form-label">Jenis Kalamin</label>
+                    <select class="form-control" required>
+                        <option value="L">Laki-laki</option>
+                        <option value="P">Pawéwé</option>
+                    </select>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label class="form-label">Golongan Darah</label>
+                    <select class="form-control">
+                        <option value="">Pilih...</option>
+                        <option value="A">A</option>
+                        <option value="B">B</option>
+                        <option value="AB">AB</option>
+                        <option value="O">O</option>
+                    </select>
+                </div>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Alamat</label>
+                <textarea class="form-control" rows="3" required
+                          minlength="10" maxlength="1000"></textarea>
+            </div>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Telepon</label>
+                    <input type="tel" class="form-control"
+                           pattern="[\+]?[0-9\s\-]{8,20}"
+                           title="Nomor telepon: 8-20 digit, bisa ngandung +, spasi, jeung tanda hubung">
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Kontak Darurat</label>
+                    <input type="tel" class="form-control"
+                           pattern="[\+]?[0-9\s\-]{8,20}"
+                           title="Nomor telepon: 8-20 digit, bisa ngandung +, spasi, jeung tanda hubung">
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary">
+                <i class="bi bi-check"></i> Simpen
+            </button>
+        </form>
+    </div>
+</div>
+{% endblock %}

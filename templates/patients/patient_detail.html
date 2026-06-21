@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}{{ patient }} - Klinik{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="bi bi-person"></i> {{ patient }}</h2>
+    <a href="{% url 'patient_list' %}" class="btn btn-secondary">
+        <i class="bi bi-arrow-left"></i> Balik
+    </a>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card shadow-sm">
+            <div class="card-header"><h5 class="mb-0">Informasi Pribadi</h5></div>
+            <div class="card-body">
+                <p><strong>NIK:</strong> {{ patient.nik }}</p>
+                <p><strong>Tanggal Lahir:</strong> {{ patient.date_of_birth }}</p>
+                <p><strong>Umur:</strong> {{ patient.age }} taun</p>
+                <p><strong>Jenis Kalamin:</strong> {{ patient.get_gender_display }}</p>
+                <p><strong>Golongan Darah:</strong> {{ patient.blood_type|default:"-" }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card shadow-sm">
+            <div class="card-header"><h5 class="mb-0">Kontak & Alamat</h5></div>
+            <div class="card-body">
+                <p><strong>Alamat:</strong> {{ patient.address }}</p>
+                <p><strong>Telepon:</strong> {{ patient.phone|default:"-" }}</p>
+                <p><strong>Kontak Darurat:</strong> {{ patient.emergency_contact|default:"-" }}</p>
+                <p><strong>No. Darurat:</strong> {{ patient.emergency_phone|default:"-" }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

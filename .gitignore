@@ -41,3 +41,16 @@ staticfiles/
 # Backup
 *.sql.gz
 *.tar.gz
+
+# Testing (exclude test files - only keep source, not tests)
+*/tests.py
+*/test_*.py
+
+# Accessibility checker (local tool)
+accessibility_checker.py
+A11Y_REPORT.md
+
+# Deployment checklists (local only)
+DEPLOYMENT_CHECKLIST.md
+DEPLOYMENT_READY.md
+UPLOAD_TO_GITHUB.md

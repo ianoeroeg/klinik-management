@@ -1,0 +1,670 @@
+{% extends "base.html" %}
+{% block title %}Dashboard Dokter - Klinik{% endblock %}
+{% block extra_css %}
+<style>
+    .dashboard-header {
+        background: linear-gradient(135deg, #2193b0 0%, #6dd5ed 100%);
+        color: white;
+        padding: 30px;
+        border-radius: 15px;
+        margin-bottom: 30px;
+        box-shadow: 0 10px 30px rgba(33, 147, 176, 0.3);
+    }
+    
+    .dashboard-header h1 {
+        font-weight: 700;
+        margin-bottom: 10px;
+    }
+    
+    .dashboard-header p {
+        opacity: 0.9;
+        margin-bottom: 0;
+    }
+    
+    .stat-card {
+        border: none;
+        border-radius: 15px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+        transition: all 0.3s ease;
+        overflow: hidden;
+        position: relative;
+    }
+    
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    }
+    
+    .stat-card .stat-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 15px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        color: white;
+        position: absolute;
+        top: 20px;
+        right: 20px;
+    }
+    
+    .stat-card .stat-content {
+        padding: 25px;
+    }
+    
+    .stat-card .stat-value {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 5px;
+    }
+    
+    .stat-card .stat-label {
+        font-size: 0.9rem;
+        color: #6c757d;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .stat-card .stat-change {
+        font-size: 0.85rem;
+        margin-top: 10px;
+        padding: 5px 10px;
+        border-radius: 20px;
+        display: inline-block;
+    }
+    
+    .stat-change.positive {
+        background-color: #d4edda;
+        color: #155724;
+    }
+    
+    .stat-change.negative {
+        background-color: #f8d7da;
+        color: #721c24;
+    }
+    
+    .stat-card.appointments .stat-icon { background: linear-gradient(135deg, #2193b0, #6dd5ed); }
+    .stat-card.patients .stat-icon { background: linear-gradient(135deg, #11998e, #38ef7d); }
+    .stat-card.revenue .stat-icon { background: linear-gradient(135deg, #f7971e, #ffd200); }
+    .stat-card.prescriptions .stat-icon { background: linear-gradient(135deg, #ee0979, #ff6a00); }
+    .stat-card.completed .stat-icon { background: linear-gradient(135deg, #56ab2f, #a8e063); }
+    .stat-card.pending .stat-icon { background: linear-gradient(135deg, #fc4a1a, #f7b733); }
+    
+    .chart-card {
+        border: none;
+        border-radius: 15px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+        overflow: hidden;
+    }
+    
+    .chart-card .card-header {
+        background: white;
+        border-bottom: 2px solid #f0f0f0;
+        padding: 20px;
+        font-weight: 600;
+        color: #2c3e50;
+    }
+    
+    .activity-item {
+        padding: 15px 0;
+        border-bottom: 1px solid #f0f0f0;
+        transition: background-color 0.2s ease;
+    }
+    
+    .activity-item:last-child {
+        border-bottom: none;
+    }
+    
+    .activity-item:hover {
+        background-color: #f8f9fa;
+        margin: 0 -15px;
+        padding-left: 15px;
+        padding-right: 15px;
+    }
+    
+    .activity-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 16px;
+        color: white;
+        flex-shrink: 0;
+    }
+    
+    .status-badge {
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-weight: 600;
+        font-size: 0.85rem;
+    }
+    
+    .status-scheduled { background-color: #d1ecf1; color: #0c5460; }
+    .status-in_progress { background-color: #fff3cd; color: #856404; }
+    .status-completed { background-color: #d4edda; color: #155724; }
+    .status-cancelled { background-color: #f8d7da; color: #721c24; }
+    
+    .quick-action {
+        text-align: center;
+        padding: 25px 15px;
+        border-radius: 15px;
+        background: white;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+        transition: all 0.3s ease;
+        text-decoration: none;
+        color: #2c3e50;
+    }
+    
+    .quick-action:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        color: #2c3e50;
+    }
+    
+    .quick-action i {
+        font-size: 2.5rem;
+        margin-bottom: 10px;
+    }
+    
+    .quick-action .action-label {
+        font-weight: 600;
+    }
+    
+    .doctor-profile-card {
+        border: none;
+        border-radius: 15px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+        overflow: hidden;
+    }
+    
+    .doctor-avatar {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #2193b0, #6dd5ed);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+        font-weight: bold;
+        margin: 0 auto 15px;
+    }
+    
+    .availability-toggle {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .form-check-input:checked {
+        background-color: #28a745;
+        border-color: #28a745;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Dashboard Header -->
+<div class="dashboard-header">
+    <div class="row align-items-center">
+        <div class="col">
+            <h1><i class="bi bi-person-badge"></i> Dashboard Dokter</h1>
+            <p>Selamat datang, Dr. {{ doctor.user.get_full_name }}! Ieu ringkesan padamelan anjeun.</p>
+        </div>
+        <div class="col-auto">
+            <div class="text-end">
+                <small>{{ now|date:"l, d F Y" }}</small><br>
+                <small>{{ now|date:"H:i" }} WIB</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Doctor Profile Card -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card doctor-profile-card">
+            <div class="card-body">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <div class="d-flex align-items-center">
+                            <div class="doctor-avatar">
+                                {{ doctor.user.first_name|slice:":1"|upper|default:doctor.user.username|slice:":1"|upper }}
+                            </div>
+                            <div class="ms-3">
+                                <h4 class="mb-0">Dr. {{ doctor.user.get_full_name }}</h4>
+                                <p class="text-muted mb-1">
+                                    <i class="bi bi-award"></i> {{ doctor.get_specialization_display }}
+                                    {% if doctor.education %}
+                                    &bull; {{ doctor.education }}
+                                    {% endif %}
+                                </p>
+                                <p class="text-muted mb-0">
+                                    <i class="bi bi-briefcase"></i> {{ doctor.experience_years }} taun pangalaman
+                                    &bull;
+                                    <i class="bi bi-cash-stack"></i> Rp {{ doctor.consultation_fee|floatformat:0 }} / konsultasi
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="text-md-end">
+                            <div class="availability-toggle">
+                                <span class="me-2">Status Kasedia:</span>
+                                <form method="post" action="{% url 'doctor_toggle_availability' doctor.pk %}">
+                                    {% csrf_token %}
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" 
+                                               {% if doctor.is_available %}checked{% endif %}
+                                               onchange="this.form.submit()">
+                                    </div>
+                                </form>
+                                {% if doctor.is_available %}
+                                <span class="badge bg-success ms-2"><i class="bi bi-check-circle"></i> Sayogi</span>
+                                {% else %}
+                                <span class="badge bg-secondary ms-2"><i class="bi bi-x-circle"></i> Teu Sayogi</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="row mb-4">
+    <div class="col-6 col-md-2 mb-3">
+        <a href="{% url 'appointment_list' %}" class="quick-action">
+            <i class="bi bi-calendar-check text-primary"></i>
+            <div class="action-label">Jadwal</div>
+        </a>
+    </div>
+    <div class="col-6 col-md-2 mb-3">
+        <a href="{% url 'prescription_create' %}" class="quick-action">
+            <i class="bi bi-prescription2 text-success"></i>
+            <div class="action-label">Resep Anyar</div>
+        </a>
+    </div>
+    <div class="col-6 col-md-2 mb-3">
+        <a href="{% url 'patient_list' %}" class="quick-action">
+            <i class="bi bi-people text-info"></i>
+            <div class="action-label">Daptar Pasien</div>
+        </a>
+    </div>
+    <div class="col-6 col-md-2 mb-3">
+        <a href="{% url 'invoice_list' %}" class="quick-action">
+            <i class="bi bi-receipt text-warning"></i>
+            <div class="action-label">Invoice</div>
+        </a>
+    </div>
+    <div class="col-6 col-md-2 mb-3">
+        <a href="{% url 'report' %}" class="quick-action">
+            <i class="bi bi-graph-up text-danger"></i>
+            <div class="action-label">Laporan</div>
+        </a>
+    </div>
+    <div class="col-6 col-md-2 mb-3">
+        <a href="{% url 'doctor_detail' doctor.pk %}" class="quick-action">
+            <i class="bi bi-pencil text-secondary"></i>
+            <div class="action-label">Edit Profil</div>
+        </a>
+    </div>
+</div>
+
+<!-- Statistics Cards -->
+<div class="row mb-4">
+    <!-- Today's Appointments -->
+    <div class="col-md-4 col-lg-2 mb-3">
+        <div class="card stat-card appointments">
+            <div class="stat-icon">
+                <i class="bi bi-calendar-check"></i>
+            </div>
+            <div class="stat-content">
+                <div class="stat-value">{{ today_appointments_count }}</div>
+                <div class="stat-label">Appointment</div>
+                <span class="stat-change {% if today_appointments_count > 0 %}positive{% else %}negative{% endif %}">
+                    <i class="bi bi-clock"></i> poé ieu
+                </span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Total Patients -->
+    <div class="col-md-4 col-lg-2 mb-3">
+        <div class="card stat-card patients">
+            <div class="stat-icon">
+                <i class="bi bi-people"></i>
+            </div>
+            <div class="stat-content">
+                <div class="stat-value">{{ total_patients }}</div>
+                <div class="stat-label">Total Pasien</div>
+                {% if patients_this_month > 0 %}
+                <span class="stat-change positive">
+                    <i class="bi bi-arrow-up"></i> {{ patients_this_month }} bulan ieu
+                </span>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Revenue Today -->
+    <div class="col-md-4 col-lg-3 mb-3">
+        <div class="card stat-card revenue">
+            <div class="stat-icon">
+                <i class="bi bi-cash-stack"></i>
+            </div>
+            <div class="stat-content">
+                <div class="stat-value" style="font-size: 1.5rem;">
+                    Rp {{ today_revenue|floatformat:0 }}
+                </div>
+                <div class="stat-label">Pendapatan</div>
+                <span class="stat-change positive">
+                    <i class="bi bi-calendar-day"></i> poé ieu
+                </span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Monthly Revenue -->
+    <div class="col-md-4 col-lg-3 mb-3">
+        <div class="card stat-card revenue">
+            <div class="stat-icon" style="background: linear-gradient(135deg, #00b09b, #96c93d);">
+                <i class="bi bi-calendar-month"></i>
+            </div>
+            <div class="stat-content">
+                <div class="stat-value" style="font-size: 1.5rem;">
+                    Rp {{ monthly_revenue|floatformat:0 }}
+                </div>
+                <div class="stat-label">Pendapatan Bulan</div>
+                <span class="stat-change positive">
+                    <i class="bi bi-graph-up-arrow"></i> {{ current_month_name }}
+                </span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Prescriptions -->
+    <div class="col-md-4 col-lg-2 mb-3">
+        <div class="card stat-card prescriptions">
+            <div class="stat-icon">
+                <i class="bi bi-prescription2"></i>
+            </div>
+            <div class="stat-content">
+                <div class="stat-value">{{ total_prescriptions }}</div>
+                <div class="stat-label">Total Resep</div>
+                {% if prescriptions_today > 0 %}
+                <span class="stat-change positive">
+                    <i class="bi bi-plus"></i> {{ prescriptions_today }} poé ieu
+                </span>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Charts and Today's Schedule -->
+<div class="row mb-4">
+    <!-- Revenue Chart -->
+    <div class="col-lg-8 mb-4">
+        <div class="card chart-card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span><i class="bi bi-graph-up"></i> Pendapatan 7 Poé Terakhir</span>
+            </div>
+            <div class="card-body">
+                <canvas id="revenueChart" height="100"></canvas>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Today's Schedule -->
+    <div class="col-lg-4 mb-4">
+        <div class="card chart-card">
+            <div class="card-header">
+                <i class="bi bi-calendar-week"></i> Jadwal Poé Ieu
+                {% if today_appointments %}
+                <span class="badge bg-primary ms-2">{{ today_appointments|length }}</span>
+                {% endif %}
+            </div>
+            <div class="card-body" style="max-height: 400px; overflow-y: auto;">
+                {% if today_appointments %}
+                    {% for appt in today_appointments %}
+                    <div class="activity-item">
+                        <div class="d-flex align-items-center">
+                            <div class="activity-icon" style="background: linear-gradient(135deg, #2193b0, #6dd5ed);">
+                                <i class="bi bi-person"></i>
+                            </div>
+                            <div class="activity-content">
+                                <div class="fw-bold">{{ appt.patient.user.get_full_name|default:appt.patient.user.username }}</div>
+                                <div class="text-muted small">{{ appt.appointment_time|time:"H:i" }}</div>
+                            </div>
+                            <span class="status-badge status-{{ appt.status }}">
+                                {{ appt.get_status_display }}
+                            </span>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="text-center text-muted py-4">
+                        <i class="bi bi-calendar-x" style="font-size: 2rem;"></i>
+                        <p class="mt-2">Teu aya appointment poé ieu</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Patients -->
+<div class="row mb-4">
+    <div class="col-lg-6 mb-4">
+        <div class="card chart-card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span><i class="bi bi-people"></i> Pasien Anjeun</span>
+                <a href="{% url 'patient_list' %}" class="btn btn-sm btn-outline-primary">Lihat Sadayana</a>
+            </div>
+            <div class="card-body p-0">
+                {% if recent_patients %}
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th>Nama</th>
+                                <th>Umur</th>
+                                <th>Jenis Kelamin</th>
+                                <th>Appointment</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for patient in recent_patients %}
+                            <tr>
+                                <td>
+                                    <a href="{% url 'patient_detail' patient.pk %}" class="text-decoration-none">
+                                        {{ patient.user.get_full_name|default:patient.user.username }}
+                                    </a>
+                                </td>
+                                <td>{{ patient.age }} taun</td>
+                                <td>{{ patient.get_gender_display }}</td>
+                                <td>{{ patient.last_appointment|date:"d M Y"|default:"-" }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center text-muted py-4">
+                    <i class="bi bi-people" style="font-size: 2rem;"></i>
+                    <p class="mt-2">Teu aya pasien anu diubaran ku anjeun</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Pending Invoices -->
+    <div class="col-lg-6 mb-4">
+        <div class="card chart-card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span><i class="bi bi-receipt"></i> Invoice Pending</span>
+                <a href="{% url 'invoice_list' %}" class="btn btn-sm btn-outline-primary">Lihat Sadayana</a>
+            </div>
+            <div class="card-body p-0">
+                {% if pending_invoices %}
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th>No. Invoice</th>
+                                <th>Pasien</th>
+                                <th>Total</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for inv in pending_invoices %}
+                            <tr>
+                                <td>{{ inv.invoice_number }}</td>
+                                <td>{{ inv.patient.user.get_full_name|default:inv.patient.user.username }}</td>
+                                <td>Rp {{ inv.total|floatformat:0 }}</td>
+                                <td>
+                                    <span class="badge bg-warning">
+                                        {{ inv.get_status_display }}
+                                    </span>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center text-muted py-4">
+                    <i class="bi bi-receipt" style="font-size: 2rem;"></i>
+                    <p class="mt-2">Sadayana invoice geus kabayar</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Upcoming Appointments -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card chart-card">
+            <div class="card-header">
+                <i class="bi bi-calendar3"></i> Appointment Anu Bakal Datang
+            </div>
+            <div class="card-body p-0">
+                {% if upcoming_appointments %}
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th>Tanggal</th>
+                                <th>Waktu</th>
+                                <th>Pasien</th>
+                                <th>Status</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for appt in upcoming_appointments %}
+                            <tr>
+                                <td>{{ appt.appointment_date|date:"d M Y" }}</td>
+                                <td>{{ appt.appointment_time|time:"H:i" }}</td>
+                                <td>
+                                    <a href="{% url 'patient_detail' appt.patient.pk %}" class="text-decoration-none">
+                                        {{ appt.patient.user.get_full_name|default:appt.patient.user.username }}
+                                    </a>
+                                </td>
+                                <td>
+                                    <span class="status-badge status-{{ appt.status }}">
+                                        {{ appt.get_status_display }}
+                                    </span>
+                                </td>
+                                <td>
+                                    {% if appt.status == 'scheduled' %}
+                                    <a href="{% url 'appointment_detail' appt.pk %}" class="btn btn-sm btn-info">
+                                        <i class="bi bi-eye"></i> Detail
+                                    </a>
+                                    {% elif appt.status == 'in_progress' %}
+                                    <a href="{% url 'prescription_create' %}" class="btn btn-sm btn-success">
+                                        <i class="bi bi-prescription2"></i> Resep
+                                    </a>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center text-muted py-4">
+                    <i class="bi bi-calendar-x" style="font-size: 2rem;"></i>
+                    <p class="mt-2">Teu aya appointment anu bakal datang</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js" integrity="sha384-qrFPOXlOlQfIOgCByIZCTPMBpg8XCN1P+ZibZkDnMoDqCqeUp8Z0fT9WtBp7s3774" crossorigin="anonymous"></script>
+<script>
+    // Revenue Chart
+    const revenueCtx = document.getElementById('revenueChart').getContext('2d');
+    new Chart(revenueCtx, {
+        type: 'line',
+        data: {
+            labels: {{ revenue_labels|safe }},
+            datasets: [{
+                label: 'Pendapatan (Rp)',
+                data: {{ revenue_data|safe }},
+                borderColor: '#2193b0',
+                backgroundColor: 'rgba(33, 147, 176, 0.1)',
+                borderWidth: 3,
+                fill: true,
+                tension: 0.4,
+                pointBackgroundColor: '#2193b0',
+                pointBorderColor: '#fff',
+                pointBorderWidth: 2,
+                pointRadius: 5,
+                pointHoverRadius: 7
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    callbacks: {
+                        label: function(context) {
+                            return 'Rp ' + context.parsed.y.toLocaleString('id-ID');
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function(value) {
+                            return 'Rp ' + value.toLocaleString('id-ID');
+                        }
+                    }
+                }
+            }
+        }
+    });
+</script>
+{% endblock %}

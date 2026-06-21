@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}Daftar Invoice - Klinik{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="bi bi-receipt"></i> Daftar Invoice</h2>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-body">
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>No. Invoice</th>
+                    <th>Pasien</th>
+                    <th>Subtotal</th>
+                    <th>Diskon</th>
+                    <th>Total</th>
+                    <th>Dibayar</th>
+                    <th>Status</th>
+                    <th>Aksi</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for inv in invoices %}
+                <tr>
+                    <td>{{ inv.invoice_number }}</td>
+                    <td>{{ inv.patient }}</td>
+                    <td>Rp {{ inv.subtotal|floatformat:0 }}</td>
+                    <td>Rp {{ inv.discount|floatformat:0 }}</td>
+                    <td>Rp {{ inv.total|floatformat:0 }}</td>
+                    <td>Rp {{ inv.amount_paid|floatformat:0 }}</td>
+                    <td>
+                        <span class="badge bg-{{ inv.status|yesno:'success,warning,danger,secondary' }}">
+                            {{ inv.get_status_display }}
+                        </span>
+                    </td>
+                    <td>
+                        <a href="{% url 'invoice_detail' inv.pk %}" class="btn btn-sm btn-info">
+                            <i class="bi bi-eye"></i>
+                        </a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="8" class="text-center text-muted">Belum aya invoice.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,231 @@
+{% extends "base.html" %}
+{% block title %}{{ user.get_full_name|default:user.username }} - Klinik{% endblock %}
+{% block extra_css %}
+<style>
+    .profile-header {
+        background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+        color: white;
+        padding: 40px;
+        border-radius: var(--border-radius);
+        margin-bottom: 25px;
+        position: relative;
+        overflow: hidden;
+    }
+    .profile-header::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -10%;
+        width: 200px;
+        height: 200px;
+        background: rgba(255,255,255,0.1);
+        border-radius: 50%;
+    }
+    .profile-avatar {
+        width: 80px;
+        height: 80px;
+        border-radius: 20px;
+        background: rgba(255,255,255,0.2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 15px;
+        border: 3px solid rgba(255,255,255,0.3);
+    }
+    .profile-avatar img {
+        width: 100%;
+        height: 100%;
+        border-radius: 17px;
+        object-fit: cover;
+    }
+    .info-card {
+        background: white;
+        border-radius: var(--border-radius);
+        padding: 25px;
+        box-shadow: var(--shadow-sm);
+        margin-bottom: 20px;
+    }
+    .info-card h5 {
+        font-weight: 600;
+        color: #475569;
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid #f1f5f9;
+    }
+    .info-row {
+        display: flex;
+        padding: 12px 0;
+        border-bottom: 1px solid #f8fafc;
+    }
+    .info-row:last-child {
+        border-bottom: none;
+    }
+    .info-label {
+        width: 150px;
+        font-weight: 500;
+        color: #64748b;
+        font-size: 0.9rem;
+        flex-shrink: 0;
+    }
+    .info-value {
+        color: #1e293b;
+        font-weight: 500;
+    }
+    .role-badge {
+        padding: 4px 14px;
+        border-radius: 20px;
+        font-size: 0.78rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    .role-admin { background: #ede9fe; color: #6d28d9; }
+    .role-dokter { background: #d1fae5; color: #065f46; }
+    .role-staff { background: #dbeafe; color: #1e40af; }
+    .role-pasien { background: #fef3c7; color: #92400e; }
+</style>
+{% endblock %}
+{% block content %}
+<!-- Profile Header -->
+<div class="profile-header">
+    <div class="d-flex align-items-center gap-4">
+        <div class="profile-avatar">
+            {% if user.avatar %}
+                <img src="{{ user.avatar.url }}" alt="{{ user.get_full_name|default:user.username }}">
+            {% else %}
+                {{ user.first_name|slice:":1"|upper|default:user.username|slice:":1"|upper }}
+            {% endif %}
+        </div>
+        <div>
+            <h2 class="mb-1" style="font-weight: 700;">{{ user.get_full_name|default:user.username }}</h2>
+            <p class="mb-2" style="opacity: 0.9;">@{{ user.username }}</p>
+            <span class="role-badge role-{{ user.role }}">
+                {{ user.get_role_display }}
+            </span>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Personal Info -->
+    <div class="col-lg-8">
+        <div class="info-card">
+            <h5><i class="bi bi-person-badge me-2"></i>Info Personal</h5>
+            <div class="info-row">
+                <span class="info-label">Username</span>
+                <span class="info-value">@{{ user.username }}</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Nama Lengkap</span>
+                <span class="info-value">{{ user.get_full_name|default:"—" }}</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Email</span>
+                <span class="info-value">{{ user.email|default:"—" }}</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Telepon</span>
+                <span class="info-value">{{ user.phone|default:"—" }}</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Role</span>
+                <span class="info-value">
+                    <span class="role-badge role-{{ user.role }}">
+                        {{ user.get_role_display }}
+                    </span>
+                </span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Status</span>
+                <span class="info-value">
+                    {% if user.is_active %}
+                        <span class="badge bg-success"><i class="bi bi-check-circle me-1"></i>Aktif</span>
+                    {% else %}
+                        <span class="badge bg-secondary"><i class="bi bi-x-circle me-1"></i>Teu Aktif</span>
+                    {% endif %}
+                </span>
+            </div>
+        </div>
+
+        {% if user.doctor_profile %}
+        <div class="info-card">
+            <h5><i class="bi bi-person-badge me-2"></i>Info Dokter</h5>
+            <div class="info-row">
+                <span class="info-label">Spesialisasi</span>
+                <span class="info-value">{{ user.doctor_profile.specialization|default:"—" }}</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Nomor SIP</span>
+                <span class="info-value">{{ user.doctor_profile.license_number|default:"—" }}</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Sayogi</span>
+                <span class="info-value">
+                    {% if user.doctor_profile.is_available %}
+                        <span class="badge bg-success">Sayogi</span>
+                    {% else %}
+                        <span class="badge bg-secondary">Teu Sayogi</span>
+                    {% endif %}
+                </span>
+            </div>
+        </div>
+        {% endif %}
+
+        {% if user.patient_profile %}
+        <div class="info-card">
+            <h5><i class="bi bi-person-heart me-2"></i>Info Pasien</h5>
+            <div class="info-row">
+                <span class="info-label">Tanggal Lahir</span>
+                <span class="info-value">{{ user.patient_profile.date_of_birth|date:"d F Y"|default:"—" }}</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Jenis Kelamin</span>
+                <span class="info-value">{{ user.patient_profile.get_gender_display|default:"—" }}</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Alamat</span>
+                <span class="info-value">{{ user.patient_profile.address|default:"—" }}</span>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Meta Info -->
+    <div class="col-lg-4">
+        <div class="info-card">
+            <h5><i class="bi bi-info-circle me-2"></i>Meta</h5>
+            <div class="info-row">
+                <span class="info-label">Dibuat</span>
+                <span class="info-value">{{ user.created_at|date:"d F Y, H:i" }}</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Diperbarui</span>
+                <span class="info-value">{{ user.updated_at|date:"d F Y, H:i" }}</span>
+            </div>
+        </div>
+
+         <div class="d-grid gap-2">
+            {% if user.role != 'admin' %}
+            <form method="post" action="{% url 'user_toggle_status' user.pk %}" style="display: inline;">
+                {% csrf_token %}
+                <button type="submit" class="btn {% if user.is_active %}btn-warning{% else %}btn-success{% endif %}">
+                    {% if user.is_active %}
+                        <i class="bi bi-person-x me-1"></i> Nonaktipkeun
+                    {% else %}
+                        <i class="bi bi-person-check me-1"></i> Aktipkeun
+                    {% endif %}
+                </button>
+            </form>
+            {% endif %}
+            <a href="{% url 'user_edit' user.pk %}" class="btn btn-primary">
+                <i class="bi bi-pencil me-1"></i> Edit Pengguna
+            </a>
+            <a href="{% url 'user_list' %}" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left me-1"></i> Balik
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

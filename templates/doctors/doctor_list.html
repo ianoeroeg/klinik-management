@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}Daftar Dokter - Klinik{% endblock %}
+{% block content %}
+<h2 class="mb-4"><i class="bi bi-person-badge"></i> Daftar Dokter</h2>
+<div class="card shadow-sm">
+    <div class="card-body">
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>Ngaran</th>
+                    <th>No. STR</th>
+                    <th>Spesialisasi</th>
+                    <th>Biaya Konsultasi</th>
+                    <th>Tersedia</th>
+                    <th>Aksi</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for doctor in doctors %}
+                <tr>
+                    <td>Dr. {{ doctor.get_full_name }}</td>
+                    <td>{{ doctor.license_number }}</td>
+                    <td>{{ doctor.get_specialization_display }}</td>
+                    <td>Rp {{ doctor.consultation_fee|floatformat:0 }}</td>
+                    <td>
+                        {% if doctor.is_available %}
+                        <span class="badge bg-success">Ya</span>
+                        {% else %}
+                        <span class="badge bg-secondary">Teu</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <a href="{% url 'doctor_detail' doctor.pk %}" class="btn btn-sm btn-info">
+                            <i class="bi bi-eye"></i>
+                        </a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" class="text-center text-muted">Belum aya dokter.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
