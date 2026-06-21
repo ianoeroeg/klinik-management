@@ -1,0 +1,15 @@
+[Unit]
+Description=Klinik Management System
+After=network.target
+
+[Service]
+User=www-data
+Group=www-data
+WorkingDirectory=/var/www/klinik
+Environment="PATH=/var/www/klinik/venv/bin"
+ExecStart=/var/www/klinik/venv/bin/gunicorn --workers 3 --bind unix:/var/www/klinik/klinik_project.sock klinik_project.wsgi:application
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
